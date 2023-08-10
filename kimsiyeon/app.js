@@ -18,36 +18,47 @@ const appDataSource = new DataSource({
   database: process.env.DB_DATABASE,
 });
 
-appDataSource.initialize().then(() => {
-  console.log("Data Source has been initialized!");
-});
-
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
-app.post("/users", async (req, res) => {
+app.post("/user", async (req, res, next) => {
   const { name, email, password } = req.body;
-  const saltRounds = 12;
-
-  const makeHash = bcrypt.hash(req.body.password, saltRounds);
-
+  const hashpassword = bcrypt.hashSync(password, 12);
   await appDataSource.query(
-    `INSERT INTO users(
-			name,
-			email,
-      password
-		) VALUES (?, ?, ?);
-		`,
-    { name, email, makeHash }
+    `INSERT INTO users
+    (name,email,password)
+    VALUES (? , ? , ?);`,
+    [name, email, hashpassword]
   );
-  res.status(201).json({ message: "successfully created" });
+  res.status(201).json({ message: "userCreated" });
 });
+
+//검증
+/* const checkHash = async (password, hashedPassword) => {
+  return await bcrypt.compare(password, hashedPassword);
+};
+const main = async () => {
+  const password = "0112";
+  const hashedPassword = bcrypt.hashSync(password, 12);
+  const result = await checkHash(password, hashedPassword);
+  console.log(result);
+};
+main(); */
+/////
 
 app.get("/ping", (req, res) => {
   res.json({ message: "pong" });
 });
 
-app.listen(3000, function () {
-  "listening on port 3000";
+app.listen(3000, async () => {
+  await appDataSource
+    .initialize()
+    .then(() => {
+      console.log("Data Source has been initialized!");
+    })
+    .catch((error) => {
+      console.error("Error during Data Source has been initialized", error);
+    });
+  console.log(`Listening to request on port: ${3000}`);
 });

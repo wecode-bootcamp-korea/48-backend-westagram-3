@@ -43,3 +43,17 @@ app.listen(3000, async () => {
 
   console.log(`Listening to request on port: 3000`);
 });
+
+app.post('/login', async (req, res) => {
+	const { user_id, user_pw } = req.body //프론트에서 받아오는 변수 
+    
+	const myDB = await appDataSource.query(
+		`INSERT INTO users(
+			user_id,
+			user_pw
+		) VALUES (?, ?);
+		`,
+		[ user_id, user_pw ]
+	); 
+     res.status(201).json({ message : "successfully created", myDB });
+	})

@@ -3,7 +3,10 @@ const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
 const dotenv = require("dotenv")
+const bcrypt = require("bcrypt")
+
 dotenv.config();
+
 const { DataSource } = require('typeorm');
 const appDataSource = new DataSource({
     type: process.env.DB_CONNECTION,
@@ -25,6 +28,27 @@ app.use(express.json());
 app.get("/ping", function (req, res, next) {
 	res.json({ message: "pong"});
 });
+
+app.post('/users', async (req, res) => {
+	const { name, email, password} = req.body;
+  const salt =  12
+  const hash_password = bcrypt.hashSync(password, salt);
+
+    
+	await appDataSource.query(
+		`INSERT INTO users(
+			name,
+			email,
+			password
+		) VALUES (?, ?, ?);
+		`,
+		[name, email, hash_password]
+	); 
+     res.status(201).json({ message : "successfully created" });
+	})
+
+  
+
 app.listen(3000, function() {
 	"listening on port 3000";
 });

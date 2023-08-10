@@ -34,19 +34,6 @@ app.post("/user", async (req, res, next) => {
   res.status(201).json({ message: "userCreated" });
 });
 
-//검증
-/* const checkHash = async (password, hashedPassword) => {
-  return await bcrypt.compare(password, hashedPassword);
-};
-const main = async () => {
-  const password = "0112";
-  const hashedPassword = bcrypt.hashSync(password, 12);
-  const result = await checkHash(password, hashedPassword);
-  console.log(result);
-};
-main(); */
-/////
-
 app.get("/ping", (req, res) => {
   res.json({ message: "pong" });
 });

@@ -31,7 +31,8 @@ app.get("/ping", function (req, res, next) {
 
 app.post('/users', async (req, res) => {
 	const { name, email, password} = req.body;
-  const hash = bcrypt.hashSync(password, 12);
+  const salt =  12
+  const hash_password = bcrypt.hashSync(password, salt);
 
     
 	await appDataSource.query(
@@ -41,7 +42,7 @@ app.post('/users', async (req, res) => {
 			password
 		) VALUES (?, ?, ?);
 		`,
-		[name, email, hash]
+		[name, email, hash_password]
 	); 
      res.status(201).json({ message : "successfully created" });
 	})
